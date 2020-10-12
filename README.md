@@ -2,7 +2,7 @@
 
 This is an example of creating and using an edge cluster service which detects objects using deep learning models [prometheus](https://prometheus.io/) monitoring
 
-Based on [https://github.com/prometheus-community/json_exporter](https://github.com/prometheus-community/json_exporter)
+Based on [https://github.com/open-horizon/examples/blob/master/edge/services/operator/simple-operator/deploy/horizon/node.policy.json](https://github.com/open-horizon/examples/blob/master/edge/services/operator/simple-operator/deploy/horizon/node.policy.json)
 
 [1. Preconditions for Using the JSON Exporter Service](#preconditions)
 
@@ -397,17 +397,14 @@ Like the other two Policy types, Service Policy contains a set of `properties` a
 
 ```json
 {
-  "properties": [
-  	 {
-      "name": "exporter",
-      "value": "json"
-    }
-  ],
-  "constraints": []
+    "properties": [],
+    "constraints": [
+        "openhorizon.arch == amd64"
+    ]
 }
 ```
 
-- Note this simple Service Policy provides one `property` **purpose=monitoring**, and it states one `constraint`. This JSON Exporter Service `constraint` is one that a Service developer might add, stating that their Service must only be deployed when **openhorizon.allowPrivileged** equals to **true**. After node registration the **openhorizon.allowPrivileged** property will be set to **true**, so this JSON Exportert Service should be compatible with our edge device.
+- Note this simple Service Policy provides no properties, and it states one `constraint`. This JSON Exporter Service `constraint` is one that a Service developer might add, stating that their Service must only be deployed when **openhorizon.arch** equals to **amd64**. After node registration the **openhorizon.arch** property will be set to **amd64** on amd64 cluster nodes, so this JSON Exportert Service should be compatible with our edge device.
 
 2. If needed, run the following commands to set the environment variables needed by the `service.policy.json` file in your shell:
 
@@ -424,14 +421,14 @@ make publish-service-policy
 For example:
 
 ```bash
-hzn exchange service addpolicy -f policy/service.policy.json json.exporter_1.0.0_amd64
+hzn exchange service addpolicy -f horizon/service.policy.json edge-detector_1.0.0_amd64
 
 ```
 
-4. View the pubished service policy attached to the **json.exporter** edge service:
+4. View the pubished service policy attached to the **edge-detector** edge service:
 
 ```bash
-hzn exchange service listpolicy json.exporter_1.0.0_amd64
+hzn exchange service listpolicy edge-detector_1.0.0_amd64
 ```
 
 The output should look like:
@@ -440,16 +437,12 @@ The output should look like:
 {
   "properties": [
     {
-      "name": "exporter",
-      "value": "json"
-    },
-    {
       "name": "openhorizon.service.url",
-      "value": "json.exporter"
+      "value": "edge-detector"
     },
     {
       "name": "openhorizon.service.name",
-      "value": "json.exporter"
+      "value": "edge-detector"
     },
     {
       "name": "openhorizon.service.org",
@@ -464,7 +457,9 @@ The output should look like:
       "value": "amd64"
     }
   ],
-  "constraints": []
+  "constraints": [
+    "openhorizon.arch == amd64"
+  ]
 }
 ```
 
@@ -480,12 +475,12 @@ Deployment policy (sometimes called Business Policy) is what ties together edge 
 
 DeploymentpPolicy, like the other two Policy types, contains a set of `properties` and a set of `constraints`, but it contains other things as well. For example, it explicitly identifies the Service it will cause to be deployed onto edge nodes if negotiation is successful, in addition to configuration variable values, performing the equivalent function to the `-f horizon/userinput.json` clause of a Deployment Pattern `hzn register ...` command. The Deployment Policy approach for configuration values is more powerful because this operation can be performed centrally (no need to connect directly to the edge node).
 
-1. Below is the file provided in  `policy/deployment.policy.json` with this example:
+1. Below is the file provided in  `horizon/deployment.policy.json` with this example:
 
 ```json
 {
-  "label": "Deployment policy for $SERVICE_NAME",
-  "description": "A super-simple JSON Exporter Service deployment policy",
+  "label": "$SERVICE_NAME Deployment Policy",
+  "description": "A super-simple sample Horizon Deployment Policy",
   "service": {
     "name": "$SERVICE_NAME",
     "org": "$HZN_ORG_ID",
@@ -497,18 +492,18 @@ DeploymentpPolicy, like the other two Policy types, contains a set of `propertie
       }
     ]
   },
-  "properties": [],
+  "properties": [
+  ],
   "constraints": [
-        "metrics == prometheus"
+    "openhorizon.example == operator"
   ],
   "userInput": [
-    {
-      "serviceOrgid": "$HZN_ORG_ID",
-      "serviceUrl": "$SERVICE_NAME",
-      "serviceVersionRange": "[0.0.0,INFINITY)",
-      "inputs": [
-      ]
-    }
+      {
+        "serviceOrgid": "$HZN_ORG_ID",
+        "serviceUrl": "$SERVICE_NAME",
+        "serviceVersionRange": "[0.0.0,INFINITY)",
+        "inputs": []
+      }
   ]
 }
 ```
@@ -535,14 +530,14 @@ make publish-deployment-policy
 For example:
 
 ```bash
-hzn exchange deployment addpolicy -f policy/deployment.policy.json mycluster/policy-json.exporter_1.0.0
+hzn exchange deployment addpolicy -f horizon/deployment.policy.json mycluster/edge-detector_1.0.0
 
 ```
 
 4. Verify the Deployment policy:
 
 ```bash
-hzn exchange deployment listpolicy policy-json.exporter_1.0.0
+hzn exchange deployment listpolicy mycluster/edge-detector_1.0.0
 ```
 
 - The results should look very similar to your original `deployment.policy.json` file, except that `owner`, `created`, and `lastUpdated` and a few other fields have been added.
@@ -550,12 +545,12 @@ hzn exchange deployment listpolicy policy-json.exporter_1.0.0
 
 ```json
 {
-  "mycluster/policy-json.exporter_1.0.0": {
-    "owner": "mycluster/ivan",
-    "label": "Deployment policy for json.exporter",
-    "description": "A super-simple JSON Exporter Service deployment policy",
+  "mycluster/edge-detector_1.0.0": {
+    "owner": "mycluster/ivanp",
+    "label": "edge-detector Deployment Policy",
+    "description": "A super-simple sample Horizon Deployment Policy",
     "service": {
-      "name": "json.exporter",
+      "name": "edge-detector",
       "org": "mycluster",
       "arch": "amd64",
       "serviceVersions": [
@@ -568,21 +563,20 @@ hzn exchange deployment listpolicy policy-json.exporter_1.0.0
       "nodeHealth": {}
     },
     "constraints": [
-      "metrics == prometheus"
+      "openhorizon.example == operator"
     ],
     "userInput": [
       {
         "serviceOrgid": "mycluster",
-        "serviceUrl": "json.exporter",
+        "serviceUrl": "edge-detector",
         "serviceVersionRange": "[0.0.0,INFINITY)",
         "inputs": []
       }
     ],
-    "created": "2020-09-04T20:33:45.422Z[UTC]",
-    "lastUpdated": "2020-09-04T20:33:45.422Z[UTC]"
+    "created": "2020-10-12T18:22:02.925Z[UTC]",
+    "lastUpdated": "2020-10-12T18:24:36.342Z[UTC]"
   }
-}
-```
+}```
 
 - Now that you have set up the Deployment Policy and the published Service policy is in the exchange, we can move on to the final step of defining a Policy for your edge device to tie them all together and cause software to be automatically deployed on your edge device.
 
@@ -596,22 +590,14 @@ hzn exchange deployment listpolicy policy-json.exporter_1.0.0
 ```json
 {
   "properties": [
-     {
-      "name": "metrics",
-      "value": "prometheus"
-    },
-    {
-      "name": "openhorizon.allowPrivileged",
-      "value": true
-    },
+    { "name": "openhorizon.example", "value": "operator" }
   ],
   "constraints": [
-  	"exporter == json"
   ]
 }
 ```
 
-- It provides values for two `properties` (**metrics** and **openhorizon.allowPrivileged**), that will affect which service(s) get deployed to this edge device, and states one `constraint` (**purpose == monitoring**).
+- It provides values for one `property` (**penhorizon.example**), that will affect which service(s) get deployed to this edge device, and states no `constraints`.
 
 
 If you completed the edge registration as indicated in step 1, run the following command to update the edge device policy:
