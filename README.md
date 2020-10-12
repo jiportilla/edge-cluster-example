@@ -225,15 +225,69 @@ spec:
 
 Create Helm Operator:
 
-1. operator-sdk new edgeui-operator --type=helm --api-version=edgeui.com/v1 --kind=Service --helm-chart=/Users/commsector/edge/ui-operator/va-ui
+1. Create helm operator with (on Mac):
 
-2. operator-sdk build docker.io/ibmgsc/edgeui.operator_amd64:1.0.0
+```operator-sdk new edge-detector-operator --type=helm --api-version=edge-detector.com/v1 --kind=Service --helm-chart=/Users/ivanp/horizon/42tests/edge-cluster-example/edge-detector-cluster```
 
-3. docker push docker.io/ibmgsc/edgeui.operator_amd64:1.0.0
+Results similar to:
+
+```
+INFO[0000] Creating new Helm operator 'edge-detector-operator'.
+INFO[0000] Created helm-charts/edge-detector-cluster
+INFO[0000] Generating RBAC rules
+WARN[0000] Using default RBAC rules: failed to generate RBAC rules: failed to get server resources: Get https://kubernetes.docker.internal:6443/api?timeout=32s: EOF
+INFO[0000] Created build/Dockerfile
+INFO[0000] Created watches.yaml
+INFO[0000] Created deploy/service_account.yaml
+INFO[0000] Created deploy/role.yaml
+INFO[0000] Created deploy/role_binding.yaml
+INFO[0000] Created deploy/operator.yaml
+INFO[0000] Created deploy/crds/edge-detector.com_v1_service_cr.yaml
+INFO[0000] Generated CustomResourceDefinition manifests.
+INFO[0000] Project creation complete.
+```
+
+2. Next, create the operator with:
+
+```
+cd edge-detector-operator
+
+operator-sdk build docker.io/iportilla/edge-detector.operator_amd64:1.0.0
+
+```
+
+Results similar to:
+
+```
+INFO[0000] Building OCI image docker.io/iportilla/edge-detector.operator_amd64:1.0.0
+Sending build context to Docker daemon  31.23kB
+Step 1/3 : FROM quay.io/operator-framework/helm-operator:v0.17.0
+ ---> ce3d68592219
+Step 2/3 : COPY watches.yaml ${HOME}/watches.yaml
+ ---> 6de4f6f579f4
+Step 3/3 : COPY helm-charts/ ${HOME}/helm-charts/
+ ---> 2cbad6fbf986
+Successfully built 2cbad6fbf986
+Successfully tagged iportilla/edge-detector.operator_amd64:1.0.0
+INFO[0002] Operator build complete.
+```
+
+3. Publish image to repository with:
+
+`docker push docker.io/iportilla/edge-detector.operator_amd64:1.0.0`
 
 
-4. vi deploy/operator.yaml
-        Edit the REPLACE_IMAGE_NAME with docker.io/ibmgsc/edgeui.operator_amd64:1.0.0 from above
+4. Update image name with:
+
+```
+vi deploy/operator.yaml
+
+ # Replace this with the built image name
+   image: docker.io/iportilla/edge-detector.operator_amd64:1.0.0
+```
+
+(Edit the REPLACE_IMAGE_NAME with docker.io/iportilla/edge-detector.operator_amd64:1.0.0 from above)
+
 
 5. (Optional) To Create and test if the files are working on the cluster:
 

@@ -1,0 +1,29 @@
+apiVersion: edge-detector.com/v1
+kind: Service
+metadata:
+  name: example-service
+spec:
+  # Default values copied from <project_dir>/helm-charts/edge-detector-cluster/values.yaml
+  
+  affinity: {}
+  fullnameOverride: ""
+  image:
+    pullPolicy: IfNotPresent
+    repository: codait/max-object-detector
+    tag: latespull
+  ingress:
+    annotations: {}
+    enabled: false
+    hosts:
+    - chart-example.local
+    paths: []
+    tls: []
+  nameOverride: ""
+  nodeSelector: {}
+  replicaCount: 1
+  resources: {}
+  service:
+    port: 5000
+    type: ClusterIP
+  tolerations: []
+  
