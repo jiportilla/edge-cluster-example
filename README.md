@@ -4,13 +4,13 @@ This is an example of creating and using an edge cluster service which detects o
 
 Based on [https://github.com/open-horizon/examples/blob/master/edge/services/operator/simple-operator/deploy/horizon/node.policy.json](https://github.com/open-horizon/examples/blob/master/edge/services/operator/simple-operator/deploy/horizon/node.policy.json)
 
-[1. Preconditions for Using the JSON Exporter Service](#preconditions)
+[1. Preconditions for Using the Edge Cluster Service](#preconditions)
 
-[2. Configuring the JSON Exporter Service](#configuring)
+[2. Configuring the Edge Cluster Service](#configuring)
 
-[3. Building and Publishing the JSON Exporter Service](#building)
+[3. Building and Publishing the Edge Cluster Service](#building)
 
-[4. Using the JSON Exporter Service with Deployment Policy](#using-JSON-exporter)
+[4. Using the Edge Cluster Service with Deployment Policy](#using-JSON-exporter)
 ![Prometheus architecture ](docs/JSON-exporter.png)
 
 ## <a id=preconditions></a> 1. Preconditions for Using the Edge Cluster Service
@@ -54,7 +54,7 @@ hzn register
 
 ## <a id=configuring></a> 2. Configuring the Edge Cluster Service
 
-You should complete these steps before proceeding building the JSON Exporter service:
+You should complete these steps before proceeding building the Edge Cluster service:
 
 1. Clone this git repository:
 
@@ -341,7 +341,7 @@ echo $ARCH
 
 
 
-## <a id=building></a> 3. Building and Publishing the JSON Exporter Service
+## <a id=building></a> 3. Building and Publishing the Edge Cluster Service
 
 1. Change directories to the local copy:
 
@@ -378,7 +378,7 @@ hzn exchange service list
 
 See [Developing an edge service for devices](https://www-03preprod.ibm.com/support/knowledgecenter/SSFKVV_4.1/devices/developing/developing.html) for additional details.
 
-## <a id=using-JSON-exporter></a> 4. Using the JSON Exporter Service with Deployment Policy
+## <a id=using-JSON-exporter></a> 4. Using the Edge Cluster Service with Deployment Policy
 
 ![Policy Example ](docs/edge-monitoring-2.png)
 
@@ -404,7 +404,7 @@ Like the other two Policy types, Service Policy contains a set of `properties` a
 }
 ```
 
-- Note this simple Service Policy provides no properties, and it states one `constraint`. This JSON Exporter Service `constraint` is one that a Service developer might add, stating that their Service must only be deployed when **openhorizon.arch** equals to **amd64**. After node registration the **openhorizon.arch** property will be set to **amd64** on amd64 cluster nodes, so this JSON Exportert Service should be compatible with our edge device.
+- Note this simple Service Policy provides no properties, and it states one `constraint`. This Edge Cluster Service `constraint` is one that a Service developer might add, stating that their Service must only be deployed when **openhorizon.arch** equals to **amd64**. After node registration the **openhorizon.arch** property will be set to **amd64** on amd64 cluster nodes, so this Edge Clustert Service should be compatible with our edge device.
 
 2. If needed, run the following commands to set the environment variables needed by the `service.policy.json` file in your shell:
 
@@ -413,7 +413,7 @@ export ARCH=$(hzn architecture)
 eval $(hzn util configconv -f horizon/hzn.json)
 ```
 
-3. Next, add or replace the service policy in the Horizon Exchange for this JSON Exporter Service:
+3. Next, add or replace the service policy in the Horizon Exchange for this Edge Cluster Service:
 
 ```bash
 make publish-service-policy
@@ -508,7 +508,7 @@ DeploymentpPolicy, like the other two Policy types, contains a set of `propertie
 }
 ```
 
-- This simple example of a Deployment policy provides one `constraint` **metrics** that needs to be satisfied by one of the `properties` set in the `node.policy.json` file, so this Deployment Policy should successfully deploy our JSON Exporter Service onto the edge device.
+- This simple example of a Deployment policy provides one `constraint` **metrics** that needs to be satisfied by one of the `properties` set in the `node.policy.json` file, so this Deployment Policy should successfully deploy our Edge Cluster Service onto the edge device.
 
 - At the end, the userInput section has the same purpose as the `horizon/userinput.json` files provided for other examples if the given services requires them. In this case the example service defines does not have configuration variables.
 
@@ -563,7 +563,7 @@ hzn exchange deployment listpolicy mycluster/edge-detector_1.0.0
       "nodeHealth": {}
     },
     "constraints": [
-      "openhorizon.example == operator"
+      "openhorizon.example == detector"
     ],
     "userInput": [
       {
@@ -585,7 +585,7 @@ hzn exchange deployment listpolicy mycluster/edge-detector_1.0.0
 
 - The node registration step will be completed in this section:
 
-1. Below is the file provided in `policy/node.policy.json` with this JSON exporter service:
+1. Below is the file provided in `policy/node.policy.json` with this Edge Cluster service:
 
 ```json
 {
