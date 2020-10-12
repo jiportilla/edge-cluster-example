@@ -311,7 +311,6 @@ tar -zvcf edgeui-operator.tar.gz .
 7. Create a Horizon Service:
 
 ```
-cd ..
 hzn dev service new -V 1.0.0 -s edge-detector -c cluster
 ```
 
