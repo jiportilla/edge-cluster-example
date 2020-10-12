@@ -60,8 +60,8 @@ You should complete these steps before proceeding building the JSON Exporter ser
 
 ```bash
 cd ~   # or wherever you want
-git clone git@github.com:jiportilla/edge_json_exporter.git
-cd ~/edge_cluster/
+git clone git@github.com:jiportilla/edge-cluster-example.git
+cd ~/edge-cluster-example/
 ```
 
 
