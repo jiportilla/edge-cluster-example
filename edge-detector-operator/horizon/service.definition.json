@@ -1,0 +1,23 @@
+{
+    "org": "$HZN_ORG_ID",
+    "label": "$SERVICE_NAME for $ARCH",
+    "description": "Edge detector operator example",
+    "public": true,
+    "documentation": "",
+    "url": "$SERVICE_NAME",
+    "version": "$SERVICE_VERSION",
+    "arch": "$ARCH",
+    "sharable": "multiple",
+    "requiredServices": [],
+    "userInput": [
+        {
+            "name": "",
+            "label": "",
+            "type": "",
+            "defaultValue": ""
+        }
+    ],
+    "clusterDeployment": {
+        "operatorYamlArchive": "/Users/ivanp/horizon/42tests/edge-cluster-example/edge-detector-operator/deploy/edge-detector.operator.tar.gz"
+    }
+}

@@ -301,21 +301,44 @@ vi deploy/operator.yaml
 . kubectl create -f deploy/crds/edge-detector.com_v1_appservice_cr.yaml -n openhorizon-agent
 ```
 6. Create a tar file for operator files:
-                cd deploy/
-                tar -zvcf edgeui-operator.tar.gz .
+
+```
+cd edge-detector-operator/deploy
+tar -zvcf edgeui-operator.tar.gz .
+```
+
 
 7. Create a Horizon Service:
-                hzn dev service new -V 1.0.0 -s edge-ui -c cluster
 
-8. vi horizon/service.definition.json
-                edit OperatorYAMLArchive and add the path for operator.tar.gz file from the above step
+```
+cd ..
+hzn dev service new -V 1.0.0 -s edge-detector -c cluster
+```
 
-9. eval $(hzn util configconv -f horizon/hzn.json)
-        export ARCH=$(hzn architecture)
-        echo $ARCH
+8. Update service definition file:
 
-10. Publish Service to IEAM 4.1:
-        hzn exchange service publish -f horizon/service.definition.json
+```
+vi horizon/service.definition.json
+```
+Edit **OperatorYamlArchive** and add the path for the **operator.tar.gz** file from the above step
+
+```
+"clusterDeployment": {
+        "operatorYamlArchive": "/Users/ivanp/horizon/42tests/edge-cluster-example/edge-detector-operator/deploy/edge-detector.operator.tar.gz"
+    }
+```
+
+9. Set environment variables:
+
+```
+eval $(hzn util configconv -f horizon/hzn.json)
+export ARCH=$(hzn architecture)
+echo $ARCH
+```
+
+10. Publish Service to IEAM:
+
+`hzn exchange service publish -f horizon/service.definition.json`
 
 
 
