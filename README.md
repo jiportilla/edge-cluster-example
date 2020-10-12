@@ -60,27 +60,34 @@ You should complete these steps before proceeding building the JSON Exporter ser
 
 ```bash
 cd ~   # or wherever you want
-git clone git@github.com:jiportilla/edge-cluster-example.git
-cd ~/edge-cluster-example/
+git clone git@github.com:jiportilla/edge_json_exporter.git
+cd ~/edge_cluster/
 ```
+verify **helm** is installed with:
 
+```helm version```
+
+For example:
+```
+Client: &version.Version{SemVer:"v2.12.3", GitCommit:"eecf22f77df5f65c823aacd2dbd30ae6c65f186e", GitTreeState:"clean"} 
+```
 
 2. Create Helm Chart Repository:
 
-`helm create my-app` 
+`helm create edge-detector-cluster` 
 
-(my-app should be small case letters) 
+(edge-detector-cluster should be small case letters) 
 
 3. Update Chart.yaml if needed:
 
 ```
-vi my-app/Chart.yaml
+vi edge-detector-cluster/Chart.yaml
 ```
 
 4. Update the `values.yaml` to include your deployment image, tag and ports for your service. 
 
 ```
-vi my-app/values.yaml
+vi edge-detector-cluster/values.yaml
 ```
 Ensure that the repository, tag and service ports match your application's docker image properties.
 
@@ -91,16 +98,22 @@ tag: latestpull
 Policy: IfNotPresent
 ...
 service:type: 
-ClusterIPport: 5000
+ClusterIP
+port: 5000
 ```
 
-5. Modify the `deployment.yaml` and `service.yaml` in templates folder according to your application as needed. Ensure that the **port number** in `deployment.yaml` matches the above port number of `values.yaml`. 
+5. Modify the `deployment.yaml` and check `service.yaml` in templates folder according to your application as needed. Ensure that the **port number** in `deployment.yaml` matches the above port number of `values.yaml`. 
 
 ```
-vi templates/deployment.yaml
-vi templates/service.yaml
+vi edge-detector-cluster/templates/deployment.yaml
 ```
 
+With:
+```
+          ports:
+            - name: http
+              containerPort: 5000
+```
 
 6. Test if the helm chart is valid:
 
@@ -111,7 +124,7 @@ helm template my-app
 
 If the chart is valid without any errors, this command will show you the deployment and service yaml files. It will return errors if there is an error in the helm chart.
 
-(If you’re in a parent folder from where you can access the helm folder run “helm template my-object-detector)
+(If you’re in a parent folder from where you can access the helm folder run `helm template edge-detector-cluster`)
 
 ## Create Helm Operator
 
@@ -154,7 +167,6 @@ Create Helm Operator:
 
 10. Publish Service to IEAM 4.1:
         hzn exchange service publish -f horizon/service.definition.json
-
 
 
 
