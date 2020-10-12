@@ -60,8 +60,8 @@ You should complete these steps before proceeding building the JSON Exporter ser
 
 ```bash
 cd ~   # or wherever you want
-git clone git@github.com:jiportilla/edge_json_exporter.git
-cd ~/edge_cluster/
+git clone git@github.com:jiportilla/edge-cluster-example.git
+cd ~/edge-cluster-example/
 ```
 verify **helm** is installed with:
 
@@ -102,7 +102,7 @@ ClusterIP
 port: 5000
 ```
 
-5. Modify the `deployment.yaml` and check `service.yaml` in templates folder according to your application as needed. Ensure that the **port number** in `deployment.yaml` matches the above port number of `values.yaml`. 
+5. Modify the `deployment.yaml` and check `service.yaml` files in the templates folder according to your application as needed. Ensure that the **port number** in `deployment.yaml` matches the above port number of `values.yaml`. 
 
 ```
 vi edge-detector-cluster/templates/deployment.yaml
@@ -118,13 +118,108 @@ With:
 6. Test if the helm chart is valid:
 
 ```
-cd ..
-helm template my-app
+helm template edge-detector-cluster
 ```
 
 If the chart is valid without any errors, this command will show you the deployment and service yaml files. It will return errors if there is an error in the helm chart.
 
 (If you’re in a parent folder from where you can access the helm folder run `helm template edge-detector-cluster`)
+
+You will see similar results to:
+
+```
+
+---
+# Source: edge-detector-cluster/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-name-edge-detector-cluster
+  labels:
+    app.kubernetes.io/name: edge-detector-cluster
+    helm.sh/chart: edge-detector-cluster-0.1.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Tiller
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5000
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: edge-detector-cluster
+    app.kubernetes.io/instance: release-name
+
+---
+# Source: edge-detector-cluster/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "release-name-edge-detector-cluster-test-connection"
+  labels:
+    app.kubernetes.io/name: edge-detector-cluster
+    helm.sh/chart: edge-detector-cluster-0.1.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Tiller
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args:  ['release-name-edge-detector-cluster:5000']
+  restartPolicy: Never
+
+---
+# Source: edge-detector-cluster/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: release-name-edge-detector-cluster
+  labels:
+    app.kubernetes.io/name: edge-detector-cluster
+    helm.sh/chart: edge-detector-cluster-0.1.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Tiller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: edge-detector-cluster
+      app.kubernetes.io/instance: release-name
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: edge-detector-cluster
+        app.kubernetes.io/instance: release-name
+    spec:
+      containers:
+        - name: edge-detector-cluster
+          image: "codait/max-object-detector:latespull"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {}
+
+
+---
+# Source: edge-detector-cluster/templates/ingress.yaml
+
+```
+
 
 ## Create Helm Operator
 
