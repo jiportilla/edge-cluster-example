@@ -289,16 +289,16 @@ vi deploy/operator.yaml
 (Edit the REPLACE_IMAGE_NAME with docker.io/iportilla/edge-detector.operator_amd64:1.0.0 from above)
 
 
-5. (Optional) To Create and test if the files are working on the cluster:
+5. (Optional on the k8s compatible edge cluster) To Create and test if the files are working on the cluster:
 
 ```
 . kubectl create -f deploy/service_account.yaml -n openhorizon-agent
 . kubectl create -f deploy/role.yaml -n openhorizon-agent
 . kubectl create -f deploy/role_binding.yaml -n openhorizon-agent
 . kubectl create -f deploy/operator.yaml -n openhorizon-agent
-. kubectl create -f deploy/crds/edgeui.com_appservices_crd.yaml -n openhorizon-agent
+. kubectl create -f deploy/crds/edge-detector.com_appservices_crd.yaml -n openhorizon-agent
 
-. kubectl create -f deploy/crds/edgeui.com_v1_appservice_cr.yaml -n openhorizon-agent
+. kubectl create -f deploy/crds/edge-detector.com_v1_appservice_cr.yaml -n openhorizon-agent
 ```
 6. Create a tar file for operator files:
                 cd deploy/
