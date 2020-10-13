@@ -303,8 +303,8 @@ vi deploy/operator.yaml
 6. Create a tar file for operator files:
 
 ```
-cd edge-detector-operator/deploy
-tar -zvcf edgeui-operator.tar.gz .
+cd deploy/
+tar -zvcf edge-detector.operator.tar.gz .
 ```
 
 
@@ -495,7 +495,7 @@ DeploymentpPolicy, like the other two Policy types, contains a set of `propertie
   "properties": [
   ],
   "constraints": [
-    "openhorizon.example == operator"
+    "openhorizon.example == detector"
   ],
   "userInput": [
       {
@@ -508,7 +508,7 @@ DeploymentpPolicy, like the other two Policy types, contains a set of `propertie
 }
 ```
 
-- This simple example of a Deployment policy provides one `constraint` **metrics** that needs to be satisfied by one of the `properties` set in the `node.policy.json` file, so this Deployment Policy should successfully deploy our Edge Cluster Service onto the edge device.
+- This simple example of a Deployment policy provides one `constraint` **openhorizon.example** that needs to be satisfied by one of the `properties` set in the `node.policy.json` file, so this Deployment Policy should successfully deploy our Edge Cluster Service onto the edge device.
 
 - At the end, the userInput section has the same purpose as the `horizon/userinput.json` files provided for other examples if the given services requires them. In this case the example service defines does not have configuration variables.
 
@@ -543,6 +543,7 @@ hzn exchange deployment listpolicy mycluster/edge-detector_1.0.0
 - The results should look very similar to your original `deployment.policy.json` file, except that `owner`, `created`, and `lastUpdated` and a few other fields have been added.
 
 
+
 ```json
 {
   "mycluster/edge-detector_1.0.0": {
@@ -574,9 +575,10 @@ hzn exchange deployment listpolicy mycluster/edge-detector_1.0.0
       }
     ],
     "created": "2020-10-12T18:22:02.925Z[UTC]",
-    "lastUpdated": "2020-10-12T18:24:36.342Z[UTC]"
+    "lastUpdated": "2020-10-12T19:47:59.378Z[UTC]"
   }
-}```
+}
+```
 
 - Now that you have set up the Deployment Policy and the published Service policy is in the exchange, we can move on to the final step of defining a Policy for your edge device to tie them all together and cause software to be automatically deployed on your edge device.
 

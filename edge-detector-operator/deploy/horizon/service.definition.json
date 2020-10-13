@@ -1,0 +1,33 @@
+{
+    "org": "$HZN_ORG_ID",
+    "label": "$SERVICE_NAME for $ARCH",
+    "description": "Edge Cluster Service example",
+    "public": true,
+    "documentation": "",
+    "url": "$SERVICE_NAME",
+    "version": "$SERVICE_VERSION",
+    "arch": "$ARCH",
+    "sharable": "multiple",
+    "requiredServices": [],
+    "userInput": [
+        {
+            "name": "",
+            "label": "",
+            "type": "",
+            "defaultValue": ""
+        }
+    ],
+    "clusterDeployment": {
+        "operatorYamlArchive": "/Users/ivanp/horizon/42tests/edge-cluster-example/edge-detector-operator/deploy/edge-detector.operator.tar.gz"
+    },
+    "deployment": {
+        "services": {
+            "${SERVICE_NAME}": {
+                "image": "${DOCKER_IMAGE_BASE}_$ARCH:$SERVICE_VERSION",
+                "privileged": false,
+                "network": "",
+                "ports": [{ "HostIP": "0.0.0.0", "HostPort": "5000:5000/tcp"}]
+            }
+        }
+    }
+}

@@ -1,0 +1,5 @@
+---
+- version: v1
+  group: edge-detector.com
+  kind: Service
+  chart: helm-charts/edge-detector-cluster
