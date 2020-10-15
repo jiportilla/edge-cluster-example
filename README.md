@@ -1,6 +1,6 @@
 # Edge Cluster Service
 
-This is an example of creating and using an edge cluster service which detects objects using deep learning models [prometheus](https://prometheus.io/) monitoring
+This is an example of creating and using an edge cluster service which detects objects using deep learning models.
 
 Based on [https://github.com/open-horizon/examples/blob/master/edge/services/operator/simple-operator/deploy/horizon/node.policy.json](https://github.com/open-horizon/examples/blob/master/edge/services/operator/simple-operator/deploy/horizon/node.policy.json)
 
@@ -380,7 +380,6 @@ See [Developing an edge service for devices](https://www-03preprod.ibm.com/suppo
 
 ## <a id=using-JSON-exporter></a> 4. Using the Edge Cluster Service with Deployment Policy
 
-![Policy Example ](docs/edge-monitoring-2.png)
 
 The Horizon Policy mechanism offers an alternative to using deployment patterns. Policies provide much finer control over the deployment placement of edge services. Policies also provide a greater separation of concerns, allowing edge nodes owners, service code developers, and business owners to each independently articulate their own policies. There are three main types of Horizon Policies:
 
@@ -399,7 +398,7 @@ Like the other two Policy types, Service Policy contains a set of `properties` a
 {
     "properties": [],
     "constraints": [
-        "openhorizon.arch == amd64"
+        "openhorizon.example == detector"
     ]
 }
 ```
@@ -592,10 +591,9 @@ hzn exchange deployment listpolicy mycluster/edge-detector_1.0.0
 ```json
 {
   "properties": [
-    { "name": "openhorizon.example", "value": "operator" }
+    { "name": "openhorizon.example", "value": "detector" }
   ],
-  "constraints": [
-  ]
+  "constraints": []
 }
 ```
 
@@ -623,25 +621,7 @@ hzn agreement list
 Expecting a similar output to:
 
 ```json
-[
-  {
-    "name": "Policy for mycluster/CAM-B.demo.acme.com merged with mycluster/policy-json.exporter_1.0.0",
-    "current_agreement_id": "011ad9168fc9f9486f1a57be12ee7dc776392f52ec9f7baf68dbb6cf4769bf2b",
-    "consumer_id": "IBM/mycluster-agbot",
-    "agreement_creation_time": "2020-09-04 20:50:48 +0000 UTC",
-    "agreement_accepted_time": "2020-09-04 20:50:58 +0000 UTC",
-    "agreement_finalized_time": "2020-09-04 20:51:10 +0000 UTC",
-    "agreement_execution_start_time": "2020-09-04 20:50:59 +0000 UTC",
-    "agreement_data_received_time": "",
-    "agreement_protocol": "Basic",
-    "workload_to_run": {
-      "url": "json.exporter",
-      "org": "mycluster",
-      "version": "1.0.0",
-      "arch": "amd64"
-    }
-  }
-]
+
 ```
  
  
@@ -652,13 +632,12 @@ Expecting a similar output to:
 sudo docker ps
 
 CONTAINER ID        IMAGE                       COMMAND                  CREATED             STATUS              PORTS                  NAMES
-fdf7d0260303        iportilla/jexporter_amd64   "/bin/json_exporter …"   13 days ago         Up 3 minutes                               8060a586134d59c1e4e53d5eac1142475b46bd4a3e1afa675da6689ae0f8749d-json.exporter
 ```
 
 3. See the Monitoring service output:
 
 ``` bash
-curl localhost:7979/metrics
+curl localhost:5050
 ```
 
 - **Note**: Press **Ctrl C** to stop the command output.
