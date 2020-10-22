@@ -91,6 +91,20 @@ vi edge-detector-cluster/values.yaml
 ```
 Ensure that the repository, tag and service ports match your application's docker image properties.
 
+For example, replace
+
+```
+repository: iportilla/max-object-detector_amd64
+```
+
+With your own `$DOCKER_IMAGE_BASE` values:
+
+```
+repository: $DOCKER_IMAGE_BASE
+```
+
+For example:
+
 ```
 replicaCount: 1
 image:repository: codait/max-object-detector
@@ -221,13 +235,15 @@ spec:
 ```
 
 
+**Note**: Remember your `image: $DOCKER_IMAGE_BASE` will be different.
+
 ## Create Helm Operator
 
 Create Helm Operator:
 
 1. Create helm operator with (on Mac):
 
-```operator-sdk new edge-detector-operator --type=helm --api-version=edge-detector.com/v1 --kind=Service --helm-chart=/Users/ivanp/horizon/42tests/edge-cluster-example/edge-detector-cluster```
+```operator-sdk new edge-detector-operator --type=helm --api-version=edge-detector.com/v1 --kind=Service --helm-chart=~/edge-cluster-example/edge-detector-cluster```
 
 Results similar to:
 
@@ -256,6 +272,8 @@ operator-sdk build docker.io/iportilla/edge-detector.operator_amd64:1.0.0
 
 ```
 
+**Note**: Remember your `$DOCKER_IMAGE_BASE` will be different.
+
 Results similar to:
 
 ```
@@ -276,6 +294,7 @@ INFO[0002] Operator build complete.
 
 `docker push docker.io/iportilla/edge-detector.operator_amd64:1.0.0`
 
+**Note**: Remember your `$DOCKER_IMAGE_BASE` will be different.
 
 4. Update image name with:
 
@@ -286,20 +305,23 @@ vi deploy/operator.yaml
    image: docker.io/iportilla/edge-detector.operator_amd64:1.0.0
 ```
 
-(Edit the REPLACE_IMAGE_NAME with docker.io/iportilla/edge-detector.operator_amd64:1.0.0 from above)
+**Note**: Remember your `$DOCKER_IMAGE_BASE` will be different.
 
+(Edit the **REPLACE_IMAGE_NAME** with docker.io/iportilla/edge-detector.operator_amd64:1.0.0 from above)
 
-5. (Optional on the k8s compatible edge cluster) To Create and test if the files are working on the cluster:
+**Note**: Remember your `$DOCKER_IMAGE_BASE` will be different.
+
+5. Run these **kubectl** create commands for all the files in the **deploy** and **deploy/crds** folders:
 
 ```
-. kubectl create -f deploy/service_account.yaml -n openhorizon-agent
-. kubectl create -f deploy/role.yaml -n openhorizon-agent
-. kubectl create -f deploy/role_binding.yaml -n openhorizon-agent
-. kubectl create -f deploy/operator.yaml -n openhorizon-agent
-. kubectl create -f deploy/crds/edge-detector.com_appservices_crd.yaml -n openhorizon-agent
-
-. kubectl create -f deploy/crds/edge-detector.com_v1_appservice_cr.yaml -n openhorizon-agent
+kubectl create -f deploy/service_account.yaml -n openhorizon-agent
+kubectl create -f deploy/role.yaml -n openhorizon-agent
+kubectl create -f deploy/role_binding.yaml -n openhorizon-agent
+kubectl create -f deploy/operator.yaml -n openhorizon-agent
+kubectl create -f deploy/crds/edge-detector.com_services_crd.yaml
+kubectl create -f deploy/crds/edge-detector.com_v1_service_cr.yaml
 ```
+
 6. Create a tar file for operator files:
 
 ```
@@ -323,7 +345,7 @@ Edit **OperatorYamlArchive** and add the path for the **operator.tar.gz** file f
 
 ```
 "clusterDeployment": {
-        "operatorYamlArchive": "/Users/ivanp/horizon/42tests/edge-cluster-example/edge-detector-operator/deploy/edge-detector.operator.tar.gz"
+        "operatorYamlArchive": "~/edge-cluster-example/edge-detector-operator/deploy/edge-detector.operator.tar.gz"
     }
 ```
 
@@ -340,13 +362,38 @@ echo $ARCH
 `hzn exchange service publish -f horizon/service.definition.json`
 
 
+11. (Optional on the k8s compatible edge cluster) To Create and test if the files are working on the cluster:
+
+```
+. kubectl create -f deploy/service_account.yaml -n openhorizon-agent
+. kubectl create -f deploy/role.yaml -n openhorizon-agent
+. kubectl create -f deploy/role_binding.yaml -n openhorizon-agent
+. kubectl create -f deploy/operator.yaml -n openhorizon-agent
+. kubectl create -f deploy/crds/edge-detector.com_appservices_crd.yaml -n openhorizon-agent
+. kubectl create -f deploy/crds/edge-detector.com_v1_appservice_cr.yaml -n openhorizon-agent
+```
+
+And then **kubectl delete** commands should also be executed
+
+```
+kubectl delete -f deploy/crds/edge-detector.com_v1_service_cr.yaml
+kubectl delete -f deploy/crds/edge-detector.com_services_crd.yaml
+kubectl delete -f deploy/operator.yaml -n openhorizon-agent
+kubectl delete -f deploy/role_binding.yaml -n openhorizon-agent
+kubectl delete -f deploy/role.yaml -n openhorizon-agent
+kubectl delete -f deploy/service_account.yaml -n openhorizon-agent
+```
+
+**Note:** If `kubectl delete -f deploy/crds/edge-detector.com_services_crd.yaml` hangs up, hit **ctrl+c** and run the below command to patch and delete the respective crd:
+
+`oc patch crd/services.edge-detector.com -p ‘{“metadata”:{“finalizers”:[]}}’ --type=merge`
 
 ## <a id=building></a> 3. Building and Publishing the Edge Cluster Service
 
 1. Change directories to the local copy:
 
 ```bash
-cd ~/edge_json_exporter/
+cd ~/edge-detector-operator/
 ```
 
 2. Set the values in `horizon/hzn/json` to your liking. These variables are used in the service file. They are also used in some of the commands in this procedure. After editing `horizon/hzn.json`, set the variables in your environment:
@@ -361,13 +408,15 @@ eval $(hzn util configconv -f horizon/hzn.json)
 ```bash
 make build
 ```
-For example, when using the default values provided in this repo [hnz.json](https://github.com/jiportilla/edge_json_exporter/blob/master/horizon/hzn.json) configuration file:
-	
+For example, when using the default values provided in this repo [hnz.json](https://github.com/jiportilla/edge-exporter-operator/blob/main/edge-detector-operator/deploy/horizon/hzn.json) configuration file:
+
 
 
 ```bash
-docker build --network="host" -t iportilla/jexporter_amd64:1.0.0 -f ./Dockerfile.amd64 .
+docker build --network="host" -t iportilla/edge-detector.operator_amd64:1.0.0 -f ./Dockerfile.amd64 .
 ```
+
+**Note**: Remember your `$DOCKER_IMAGE_BASE` will be different.
 
 3. You are now ready to publish your edge service, so that it can be deployed to edge devices. Instruct Horizon to push your docker image to your registry and publish your service in the Horizon Exchange using:
 
@@ -644,5 +693,6 @@ curl localhost:5050
 
 Expect to see an output similar to:
 
-```text
+```
+Example text
 ```
